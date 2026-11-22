@@ -1,0 +1,17 @@
+{
+  "version": "1.2",
+  "notes": "O Roteador atribui o score de complexidade 1–5, que escolhe o tier. O provedor segue uma ordem única e só desce na lista se o anterior estiver indisponível ou no limite.",
+  "ordem_provedores": ["claude-trabalho", "cursor", "codex", "gemini", "claude-pessoal"],
+  "tiers": {
+    "barato": { "score": [1, 2], "uso": "tarefas rotineiras, TDD vermelho/verde, patches pequenos", "claude": "haiku" },
+    "medio":  { "score": [3],    "uso": "features médias, vários arquivos, SQL + API",              "claude": "sonnet" },
+    "caro":   { "score": [4, 5], "uso": "design/ADR, refatoração ampla, ambiguidade alta",          "claude": "opus" }
+  },
+  "escalada": "2 falhas no tier atual → tier acima → humano",
+  "regra_de_custo": "proibido tier caro em score 1–2 sem duas falhas prévias",
+  "modelos_por_papel": {
+    "orquestrador": { "modelo": "opus", "esforco": "medium" },
+    "filtro|classificador|retriever|clarificador|roteador": { "modelo": "haiku", "esforco": "low" },
+    "implementation|qa|review-pr": { "modelo": "sonnet", "esforco": "medium" }
+  }
+}
