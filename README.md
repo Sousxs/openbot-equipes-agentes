@@ -39,6 +39,35 @@ flowchart TD
 
 **Custo.** Os cinco passos da esteira rodam no modelo mais barato com esforço baixo; Opus fica só no Orquestrador. O tier de cada tarefa vem do score do Roteador (`config/llm.json`): 1–2 barato, 3 médio, 4–5 caro, e o caro é proibido em tarefa simples sem duas falhas antes. Cada agente tem reserva automática de provedor: se o Claude estiver no limite, a tarefa segue em Cursor, Codex ou Gemini.
 
+## Economia de tokens, em números
+
+Medido no próprio banco do OpenBot com `scripts/medir-economia.py` (somente leitura), em 11 dias de uso real (12 a 22 de novembro de 2026), só nos turnos do provedor Claude. Valores em US$ pelo preço de lista que o OpenBot usa para estimar; não é fatura.
+
+| | Custo | Diferença |
+|---|---:|---:|
+| **Real** (modelo por papel + cache) | **565** | |
+| Os mesmos tokens, tudo em Opus | 1.058 | modelo por papel economizou **47%** |
+| Os mesmos tokens, sem cache de prompt | 5.087 | o cache economizou **89%** |
+
+- **2,15 bilhões de tokens**, 96,5% deles lidos do cache. Sem cache, a conta seria 9 vezes maior.
+- **Os 5 passos da esteira custaram US$ 20** em Haiku; os mesmos tokens em Opus sairiam US$ 151.
+- **O Orquestrador em Opus é metade da conta** (US$ 275). É o próximo alvo: uma das equipes já roda o Orquestrador em Sonnet, em teste.
+- **A Implementation leu 1 bilhão de tokens em 130 turnos**, perto de 8 milhões por turno. É o problema 4 abaixo, em número: a conversa que só cresce. O cache segura o custo, mas o caminho certo é o estado no handoff e lotes curtos.
+
+| Papel | Tokens | Do cache | Real | Tudo em Opus |
+|---|---:|---:|---:|---:|
+| Orquestrador | 750 M | 96,6% | 274,87 | 363,99 |
+| Implementation | 1.053 M | 98,0% | 202,42 | 405,79 |
+| QA | 152 M | 93,8% | 52,16 | 105,80 |
+| Review PR | 41 M | 92,9% | 15,56 | 31,12 |
+| Classificador | 106 M | 93,2% | 11,53 | 77,47 |
+| Retriever | 34 M | 88,7% | 5,01 | 37,00 |
+| Roteador | 8 M | 72,9% | 2,06 | 18,69 |
+| Filtro | 7 M | 72,4% | 1,72 | 17,22 |
+| Clarificador | 1 M | 85,6% | 0,01 | 0,85 |
+
+Para medir no seu OpenBot: `python -I scripts/medir-economia.py`.
+
 ## Problemas e soluções
 
 ### 1. Restringir o acesso derrubou 8 agentes de uma vez
@@ -97,6 +126,7 @@ Antes do OpenBot, a esteira rodava numa plataforma própria em LangGraph com um 
 | `config/llm.json` | tiers por score, ordem de provedores e modelo por papel |
 | `skills/` | `orquestrador-plataforma`, `handoff-entre-equipes`, `busca-por-grafo` |
 | `scripts/sincronizar-regras.ps1` | distribui as regras comuns por link físico |
+| `scripts/medir-economia.py` | mede no banco do OpenBot quanto o modelo por papel e o cache economizam |
 
 ## Licença
 
