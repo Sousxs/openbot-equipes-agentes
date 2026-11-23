@@ -15,15 +15,7 @@ O repositório tem a configuração reescrita sem nada interno: regras comuns, i
 
 Cada equipe (A, B, C e D) tem os mesmos 9 agentes e atende um canal do OpenBot, um por projeto, para rodar projetos em paralelo sem misturar contexto.
 
-```mermaid
-flowchart TD
-    M["Pedido no canal"] --> O["Orquestrador · Opus"]
-    O --> F["1 · Filtro"] --> C["2 · Classificador"] --> R["3 · Retriever"] --> CL["4 · Clarificador"] --> RT["5 · Roteador"]
-    RT --> I["Implementation · Sonnet"] --> Q["QA · Sonnet"] --> RV["Review PR · Sonnet"]
-    Q -- "BLOCK" --> I
-    RV -- "DEVOLVIDO" --> I
-    RV --> H["Merge humano"]
-```
+![Raias por modelo: o orquestrador em Opus recebe o pedido, a triagem em cinco passos roda em Haiku, Implementation, QA e Review PR rodam em Sonnet com devolução para correção, e o merge é só humano](docs/diagrama-equipes.png)
 
 | Papel | Modelo | O que faz | Gate |
 |---|---|---|---|
@@ -130,4 +122,4 @@ Antes do OpenBot, a esteira rodava numa plataforma própria em LangGraph com um 
 
 ## Licença
 
-[MIT](LICENSE). OpenBot, Claude, Cursor, Codex e Gemini são marcas dos seus donos; este repositório não é afiliado a nenhum deles.
+[MIT](LICENSE). OpenBot, Claude, Cursor, Codex e Gemini são marcas dos seus donos; este repositório não é afiliado a nenhum deles. O diagrama segue o design system do [diagram-design](https://github.com/cathrynlavery/diagram-design) (MIT).
